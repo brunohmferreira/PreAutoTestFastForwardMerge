@@ -1,0 +1,35 @@
+{
+    "manifestVersion": 1,
+    "id": "gitautotestfastforwardmergedecorator",
+    "name": "Test: fast-forward merge with master",
+    "version": "1.0.0",
+    "publisher": "BrunoHenriqueMendesFerreira",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],    
+    "description": "Tests the merge from the current branch to the master automatically",
+    "categories": [
+        "Azure Pipelines"
+    ],
+    "contributions": [
+        {
+            "id": "git-auto-test-fast-forward-merge-task",
+            "type": "ms.azure-pipelines.pipeline-decorator",
+            "targets": [
+                "ms.azure-release-pipelines-agent-job.pre-job-tasks"
+            ],
+            "properties": {
+                "template": "git-auto-test-fast-forward-merge-decorator.yml"
+            }
+        }
+    ],
+    "files": [
+        {
+            "path": "git-auto-test-fast-forward-merge-decorator.yml",
+            "addressable": true,
+            "contentType": "text/plain"
+        }
+    ]
+}

@@ -1,0 +1,97 @@
+steps:
+- ${{ if and(eq(variables['Decorator.GitAutoTestFastForwardMerge.Enabled'], True), eq(variables['System.StageDisplayName'], 'PRD')) }}:
+  - task: PowerShell@2
+    displayName: 'Test: fast-forward merge with master (injected from decorator)'
+    inputs:
+      targetType: 'inline'
+      script: |
+        ############      clone repository    ##############
+        echo "##[section]Starting: Clone repository"
+
+        echo "before cloning"
+        dir
+
+        cd "$(System.DefaultWorkingDirectory)"
+        echo "after cd System.DefaultWorkingDirectory"
+        dir
+
+        mkdir _git
+        cd _git
+        echo "after create _git folder"
+        dir
+
+        $RepoPartialUri = "$(System.TeamFoundationCollectionUri)$(System.TeamProject)/_git/$(Build.Repository.Name)".SubString(8)
+        echo "Repositorio https://$RepoPartialUri"
+
+        git clone "https://$(System.AccessToken)@$RepoPartialUri"
+
+        cd $(Build.Repository.Name)
+        echo "Cloned, Working Dir changed for '$(Build.Repository.Name)'"
+
+        echo "##[section]Finishing: Clone repository"
+
+        ############      test fast-forward    ##############
+        echo "##[section]Starting: test fast-forward merge"
+
+        git checkout master
+        echo "merging on master branch with commit $(Build.SourceVersion)"
+
+         $mergeParams = "--ff-only"
+        git merge $(Build.SourceVersion) $mergeParams.Split(" ")
+        if(-not $?){
+          echo "##[error] Merge incomplete, aborting"
+          echo "##vso[task.logissue type=error] Fail to merge from $(Build.SourceBranchName) to master"
+
+          echo "##[section]Starting: Clean folder"
+
+          echo "before cleaning"
+          dir "$(System.DefaultWorkingDirectory)"
+
+          cd "$(System.DefaultWorkingDirectory)"
+          
+          if ('$(Agent.OS)' -eq 'Linux')
+          {
+            echo "Agent Linux"
+            rm -rf _git
+          }
+          else
+          {
+            echo "Agent Windows"
+            rm -r -force _git
+          }
+
+          echo "after cleaning"
+          dir "$(System.DefaultWorkingDirectory)"
+
+          echo "##[section]Finishing: Clean folder"
+
+          exit 1
+        }
+
+        echo "no conflicts, merge fast-forward test passed"
+
+        echo "##[section]Finishing: test fast-forward merge"
+
+        ############      Clean _git folder    ##############
+        echo "##[section]Starting: Clean folder"
+
+        echo "before cleaning"
+        dir "$(System.DefaultWorkingDirectory)"
+
+        cd "$(System.DefaultWorkingDirectory)"
+
+        if ('$(Agent.OS)' -eq 'Linux')
+        {
+          echo "Removing folder in Linux"
+          rm -rf _git
+        }
+        else
+        {
+          echo "Removing folder in Windows"
+          rm -r -force _git
+        }
+
+        echo "after cleaning"
+        dir "$(System.DefaultWorkingDirectory)"
+
+        echo "##[section]Finishing: Clean folder"
