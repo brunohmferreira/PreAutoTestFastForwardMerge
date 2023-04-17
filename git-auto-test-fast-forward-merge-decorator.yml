@@ -1,18 +1,12 @@
 steps:
 - ${{ if and(eq(variables['Decorator.GitAutoTestFastForwardMerge.Enabled'], True), eq(variables['System.StageDisplayName'], 'PRD')) }}:
   - task: PowerShell@2
-    displayName: 'Test: fast-forward merge with master (injected from decorator)'
+    displayName: 'Test: fast-forward merge with master - step: clone repository (injected from decorator)'
     inputs:
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
       targetType: 'inline'
       script: |
-        ############      clone repository    ##############
-        echo "##[section]Starting: Clone repository"
-
         echo "before cloning"
-        dir
-
-        cd "$(System.DefaultWorkingDirectory)"
-        echo "after cd System.DefaultWorkingDirectory"
         dir
 
         mkdir _git
@@ -28,57 +22,40 @@ steps:
         cd $(Build.Repository.Name)
         echo "Cloned, Working Dir changed for '$(Build.Repository.Name)'"
 
-        echo "##[section]Finishing: Clone repository"
+  - task: PowerShell@2
+    displayName: 'Test: fast-forward merge with master - step: test fast-forward merge (injected from decorator)'
+    inputs:
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+      targetType: 'inline'
+      script: |
+        dir
 
-        ############      test fast-forward    ##############
-        echo "##[section]Starting: test fast-forward merge"
+        cd _git
+        cd $(Build.Repository.Name)
 
         git checkout master
         echo "merging on master branch with commit $(Build.SourceVersion)"
 
-         $mergeParams = "--ff-only"
+        $mergeParams = "--ff-only"
         git merge $(Build.SourceVersion) $mergeParams.Split(" ")
         if(-not $?){
           echo "##[error] Merge incomplete, aborting"
           echo "##vso[task.logissue type=error] Fail to merge from $(Build.SourceBranchName) to master"
-
-          echo "##[section]Starting: Clean folder"
-
-          echo "before cleaning"
-          dir "$(System.DefaultWorkingDirectory)"
-
-          cd "$(System.DefaultWorkingDirectory)"
-          
-          if ('$(Agent.OS)' -eq 'Linux')
-          {
-            echo "Agent Linux"
-            rm -rf _git
-          }
-          else
-          {
-            echo "Agent Windows"
-            rm -r -force _git
-          }
-
-          echo "after cleaning"
-          dir "$(System.DefaultWorkingDirectory)"
-
-          echo "##[section]Finishing: Clean folder"
-
+          echo "##vso[task.logissue type=error] Your branch is outdated in relation to the master branch, that is, you are trying to remove some commits already published in production. Update your branch with master."
           exit 1
         }
 
         echo "no conflicts, merge fast-forward test passed"
 
-        echo "##[section]Finishing: test fast-forward merge"
-
-        ############      Clean _git folder    ##############
-        echo "##[section]Starting: Clean folder"
-
+  - task: PowerShell@2
+    displayName: 'Test: fast-forward merge with master - step: clean folder (injected from decorator)'
+    condition: succeededOrFailed()
+    inputs:
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+      targetType: 'inline'
+      script: |
         echo "before cleaning"
-        dir "$(System.DefaultWorkingDirectory)"
-
-        cd "$(System.DefaultWorkingDirectory)"
+        dir
 
         if ('$(Agent.OS)' -eq 'Linux')
         {
@@ -92,6 +69,4 @@ steps:
         }
 
         echo "after cleaning"
-        dir "$(System.DefaultWorkingDirectory)"
-
-        echo "##[section]Finishing: Clean folder"
+        dir

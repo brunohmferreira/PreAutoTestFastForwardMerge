@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "gitautotestfastforwardmergedecorator",
     "name": "Test: fast-forward merge with master",
-    "version": "1.0.0",
+    "version": "1.10.0",
     "publisher": "BrunoHenriqueMendesFerreira",
     "targets": [
         {
