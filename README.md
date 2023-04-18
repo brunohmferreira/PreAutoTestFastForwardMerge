@@ -54,3 +54,9 @@ For more info take a look at: https://docs.microsoft.com/en-us/azure/devops/exte
 Once shared with your Azure DevOps Organization, you can head to the _Manage Extensions_ tab under _Organization Settings_, go to _Shared_ and finally install your Decorato Extension.
 
 For more info take a look at: https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=azure-devops#install-your-extension
+
+### Use the extension
+
+Once installed, you need to do the following steps to run the extension:
+- Create a variable called _Decorator.GitAutoTestFastForwardMerge.Enabled_ and set it to _true_.
+- Create a stage called _PRD_.
