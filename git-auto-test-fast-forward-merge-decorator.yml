@@ -1,7 +1,7 @@
 steps:
 - ${{ if and(eq(variables['Decorator.GitAutoTestFastForwardMerge.Enabled'], True), eq(variables['System.StageDisplayName'], 'PRD')) }}:
   - task: PowerShell@2
-    displayName: 'Test: fast-forward merge with master - step: clone repository (injected from decorator)'
+    displayName: 'Clone repository [Test: fast-forward merge with master](injected from decorator)'
     inputs:
       workingDirectory: '$(System.DefaultWorkingDirectory)'
       targetType: 'inline'
@@ -23,7 +23,7 @@ steps:
         echo "Cloned, Working Dir changed for '$(Build.Repository.Name)'"
 
   - task: PowerShell@2
-    displayName: 'Test: fast-forward merge with master - step: test fast-forward merge (injected from decorator)'
+    displayName: 'Test fast-forward merge [Test: fast-forward merge with master](injected from decorator)'
     inputs:
       workingDirectory: '$(System.DefaultWorkingDirectory)'
       targetType: 'inline'
@@ -48,7 +48,7 @@ steps:
         echo "no conflicts, merge fast-forward test passed"
 
   - task: PowerShell@2
-    displayName: 'Test: fast-forward merge with master - step: clean folder (injected from decorator)'
+    displayName: 'Clean folder [Test: fast-forward merge with master](injected from decorator)'
     condition: succeededOrFailed()
     inputs:
       workingDirectory: '$(System.DefaultWorkingDirectory)'
